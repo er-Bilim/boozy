@@ -27,7 +27,7 @@ usersRouter.post(
     const correctUserData: IUserReg = {
       email: body.email,
       displayName: body.displayName,
-      avatar: req.file ? `images/${req.file.filename}` : null,
+      avatar: req.file ? `uploads/users/avatar/${req.file.filename}` : null,
       password: body.password,
     };
 
@@ -106,7 +106,7 @@ usersRouter.post(
             });
             await fs.writeFile(fullPath, response.data);
 
-            savedAvatar = `/images/${fileName}`;
+            savedAvatar = `uploads/users/avatar/${fileName}`;
           } catch (error) {
             console.error(error);
           }

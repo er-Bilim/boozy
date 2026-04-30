@@ -5,6 +5,8 @@ import { Router } from 'express';
 import auth, { type RequestWithUser } from '../../middlewares/auth.ts';
 import { cocktailUpload } from '../../middlewares/multer.ts';
 import deleteImage from '../../utils/deleteImage.ts';
+import permit from '../../middlewares/permit.ts';
+import togglePublishedHelper from '../../helpers/togglePublishedHelper.ts';
 
 const cocktailsRouter = Router();
 
@@ -15,6 +17,22 @@ cocktailsRouter.get('/', async (_req, res, next) => {
       'displayName',
     );
     res.json(cocktails);
+  } catch (error) {
+    next(error);
+  }
+});
+
+cocktailsRouter.get('/my', auth, async (req, res, next) => {
+  try {
+    const { user } = req as RequestWithUser;
+
+    const userCocktails = await Cocktail.find({ user: user._id });
+
+    if (userCocktails.length === 0) {
+      return null;
+    }
+
+    return res.json(userCocktails);
   } catch (error) {
     next(error);
   }
@@ -73,6 +91,70 @@ cocktailsRouter.post(
         res.status(400).json({ error: isValidationError(error) });
       }
 
+      next(error);
+    }
+  },
+);
+
+cocktailsRouter.patch(
+  '/:id/publish',
+  auth,
+  permit('admin'),
+  async (req, res, next) => {
+    try {
+      const cocktailID = req.params.id as string;
+
+      if (!isValidObjectId(cocktailID)) {
+        return res.status(400).json({ error: 'Invalid Cocktail ID' });
+      }
+
+      const updatedCocktail = await togglePublishedHelper(Cocktail, cocktailID);
+
+      if (!updatedCocktail) {
+        return res.status(404).json({
+          error: 'Cocktail not found',
+        });
+      }
+
+      return res.json(updatedCocktail);
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
+cocktailsRouter.delete(
+  '/:id/delete',
+  auth,
+  permit('admin', 'user'),
+  async (req, res, next) => {
+    try {
+      const cocktailID = req.params.id as string;
+
+      if (!isValidObjectId(cocktailID)) {
+        return res.status(400).json({ error: 'Invalid Cocktail ID' });
+      }
+
+      const { user } = req as RequestWithUser;
+
+      const cocktail = await Cocktail.findById(cocktailID);
+
+      if (!cocktail) {
+        return res.status(404).json({ error: 'Cocktail not found' });
+      }
+
+      const isAdmin = user.role === 'admin';
+      const isOwner = await Cocktail.findOne({ _id: cocktail, user: user._id });
+
+      if (!isAdmin && !isOwner) {
+        return res
+          .status(403)
+          .json({ error: 'You can only delete your own cocktails' });
+      }
+
+      await cocktail.deleteOne();
+      res.send({ message: 'Deleted successfully' });
+    } catch (error) {
       next(error);
     }
   },
