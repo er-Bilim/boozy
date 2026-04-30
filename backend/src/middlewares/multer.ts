@@ -19,7 +19,7 @@ const createStorage = (subDir: string) => {
 };
 
 export const imagesUpload = multer({
-  storage: createStorage('images'),
+  storage: createStorage('uploads/users/avatar'),
 });
 export const cocktailUpload = multer({
   storage: createStorage('uploads/cocktails'),
