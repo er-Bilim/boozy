@@ -8,13 +8,13 @@ import App from './App.tsx';
 import { persistor, store } from './app/store';
 
 createRoot(document.getElementById('root')!).render(
-    <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <BrowserRouter>
-          <ToastContainer />
-          <CssBaseline />
-          <App />
-        </BrowserRouter>
-      </PersistGate>
-    </Provider>
+  <Provider store={store}>
+    <PersistGate loading={null} persistor={persistor}>
+      <BrowserRouter>
+        <ToastContainer />
+        <CssBaseline />
+        <App />
+      </BrowserRouter>
+    </PersistGate>
+  </Provider>,
 );

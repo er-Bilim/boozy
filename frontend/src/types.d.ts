@@ -26,3 +26,19 @@ export interface Cocktail {
     ingredients: Ingredient[];
     ratings: Rating[];
 }
+export interface LoginMutation {
+    email: string;
+    password: string;
+  }
+  
+  export interface RegisterMutation {
+    email: string;
+    password: string;
+    displayName: string;
+    avatar?: FileList;
+  }
+  
+  export interface AuthResponse {
+    message: string;
+    user: User;
+  }

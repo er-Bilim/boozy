@@ -24,7 +24,7 @@
     "react-router-dom": "^7.14.2",
     "react-toastify": "^11.1.0",
     "redux-persist": "^6.0.0",
-    "zod": "^4.3.6"
+    "zod": "^4.4.1"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
