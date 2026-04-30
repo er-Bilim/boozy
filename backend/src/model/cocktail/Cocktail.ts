@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import type { IIngredient } from '../../types/cocktail/cocktail.types.js';
+import type { IIngredient } from '../../types/cocktail/cocktail.types.ts';
 
 const CocktailSchema = new Schema({
   user: {
