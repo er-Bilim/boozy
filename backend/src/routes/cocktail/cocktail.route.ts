@@ -55,7 +55,17 @@ cocktailsRouter.get('/:id', async (req, res, next) => {
       return res.status(404).json({ error: 'Cocktail not found' });
     }
 
-    res.json(cocktail);
+    const ratingsCount = cocktail.ratings.length;
+    const ratingsSum = cocktail.ratings.reduce((acc, r) => acc + r.score, 0);
+
+    const cocktailObject = {
+      ...cocktail.toObject(),
+      averageRating:
+        ratingsCount > 0 ? Number((ratingsSum / ratingsCount).toFixed(1)) : 0,
+      ratingsCount: ratingsCount,
+    };
+
+    res.json(cocktailObject);
   } catch (error) {
     next(error);
   }
@@ -122,6 +132,47 @@ cocktailsRouter.patch(
     }
   },
 );
+
+cocktailsRouter.patch('/:id/rate', auth, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { score } = req.body;
+    const { user } = req as RequestWithUser;
+
+    if (!score || score < 1 || score > 5) {
+      return res.status(400).json({ error: 'Score must be between 1 and 5' });
+    }
+
+    const cocktail = await Cocktail.findById(id);
+
+    if (!cocktail) {
+      return res.status(404).json({
+        error: 'Cocktail not found',
+      });
+    }
+
+    if (!cocktail.isPublished) {
+      return res.status(403).json({
+        error: 'You cannot rate a cocktail that has not been published yet',
+      });
+    }
+
+    const existingRatingIndex = cocktail.ratings.findIndex(
+      (r) => r.userId.toString() === user._id.toString(),
+    );
+
+    if (existingRatingIndex !== -1 && cocktail.ratings[existingRatingIndex]) {
+      cocktail.ratings[existingRatingIndex].score = score;
+    } else {
+      cocktail.ratings.push({ userId: user._id, score });
+    }
+
+    await cocktail.save();
+    res.send(cocktail);
+  } catch (error) {
+    next(error);
+  }
+});
 
 cocktailsRouter.delete(
   '/:id/delete',
