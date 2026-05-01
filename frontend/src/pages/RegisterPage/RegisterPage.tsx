@@ -2,10 +2,12 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import {
   Box,
   Button,
   Container,
+  Divider,
   Link,
   Paper,
   Stack,
@@ -13,7 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { register as registerUser } from '@/features/users/usersThunks';
+import { googleLogin, register as registerUser } from '@/features/users/usersThunks';
 import { selectRegisterLoading } from '@/features/users/usersSlice';
 
 const schema = z.object({
@@ -118,7 +120,23 @@ const RegisterPage = () => {
             </Button>
           </Box>
 
-          <Typography textAlign="center" sx={{ mt: 3 }}>
+          <Divider sx={{ my: 3 }}>or</Divider>
+
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                if (!credentialResponse.credential) return;
+
+                await dispatch(googleLogin(credentialResponse.credential)).unwrap();
+                navigate('/');
+              }}
+              onError={() => {
+                console.log('Google login failed');
+              }}
+            />
+          </Box>
+
+          <Typography sx={{ mt: 3, textAlign: 'center' }}>
             Already have an account?{' '}
             <Link component={RouterLink} to="/login" fontWeight={600}>
               Login

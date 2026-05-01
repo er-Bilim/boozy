@@ -2,10 +2,12 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import {
   Box,
   Button,
   Container,
+  Divider,
   Link,
   Paper,
   Stack,
@@ -13,7 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { login } from '@/features/users/usersThunks';
+import { googleLogin, login } from '@/features/users/usersThunks';
 import { selectLoginLoading } from '@/features/users/usersSlice';
 
 const schema = z.object({
@@ -51,14 +53,7 @@ const LoginPage = () => {
           justifyContent: 'center',
         }}
       >
-        <Paper
-          elevation={3}
-          sx={{
-            width: '100%',
-            p: 4,
-            borderRadius: 4,
-          }}
-        >
+        <Paper elevation={3} sx={{ width: '100%', p: 4, borderRadius: 4 }}>
           <Stack spacing={1} sx={{ mb: 3 }}>
             <Typography variant="h5" fontWeight={700}>
               Login
@@ -105,7 +100,23 @@ const LoginPage = () => {
             </Button>
           </Box>
 
-          <Typography textAlign="center" sx={{ mt: 3 }}>
+          <Divider sx={{ my: 3 }}>or</Divider>
+
+          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                if (!credentialResponse.credential) return;
+
+                await dispatch(googleLogin(credentialResponse.credential)).unwrap();
+                navigate('/');
+              }}
+              onError={() => {
+                console.log('Google login failed');
+              }}
+            />
+          </Box>
+
+          <Typography sx={{ mt: 3, textAlign: 'center' }}>
             Don’t have an account?{' '}
             <Link component={RouterLink} to="/register" fontWeight={600}>
               Register
