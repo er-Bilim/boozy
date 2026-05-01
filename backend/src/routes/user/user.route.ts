@@ -97,7 +97,7 @@ usersRouter.post(
         if (avatarGoogle) {
           try {
             const fileName = `${randomUUID()}.jpg`;
-            const destDir = path.join(config.publicPath, 'images');
+            const destDir = path.join(config.publicPath, 'uploads/users/avatar');
             const fullPath = path.join(destDir, fileName);
             await fs.mkdir(destDir, { recursive: true });
 

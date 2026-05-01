@@ -44,7 +44,7 @@ const run = async () => {
       title: 'margarita',
       recipe:
         'Shake all the ingredients in a shaker with ice. Strain into a glass with a salted rim.',
-      image: `${fixtureImagesPath}/margarita.png`,
+      image: ``,
       ingredients: [
         { name: 'Tequila', amount: '50 ml' },
         { name: 'Lime juice', amount: '25 ml' },
