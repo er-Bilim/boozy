@@ -1,0 +1,47 @@
+import type { Request, Response, NextFunction } from 'express';
+import type { HydratedDocument } from 'mongoose';
+import jwt from 'jsonwebtoken';
+import config from '../config.ts';
+import User from '../model/user/User.ts';
+import type { IUser } from '../types/user/user.types.ts';
+
+export interface RequestWithUser extends Request {
+  user: HydratedDocument<IUser>;
+}
+
+const auth = async (expressReq: Request, res: Response, next: NextFunction) => {
+  try {
+    const req = expressReq as RequestWithUser;
+
+    const accessToken = req.cookies.accessToken;
+
+    if (!accessToken) {
+      return res.status(401).json({
+        error: 'Access denied. No token provided',
+      });
+    }
+
+    const decoded = jwt.verify(accessToken, config.accessJWTSecret) as {
+      _id: string;
+    };
+
+    const user = await User.findOne({ _id: decoded._id });
+
+    if (!user) {
+      return res.status(401).json({
+        error: 'Access denied. Invalid token',
+      });
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      return res.status(401).json({
+        error: 'Token expired',
+      });
+    }
+  }
+};
+
+export default auth;

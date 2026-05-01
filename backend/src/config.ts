@@ -8,7 +8,7 @@ const rootPath = path.dirname(__filename);
 const config = {
   rootPath,
   publicPath: path.join(rootPath, "../public"),
-  db: "mongodb://localhost/chat-bilim",
+  db: "mongodb://localhost/boozy",
   refreshJWTSecret: process.env.REFRESH_SECRET_JWT ?? "secret",
   accessJWTSecret: process.env.ACCESS_SECRET_JWT ?? "secret",
   googleClientID: process.env.GOOGLE_CLIENT_ID ?? "google client",
