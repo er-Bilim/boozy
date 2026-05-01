@@ -42,7 +42,7 @@ export interface RegisterMutation {
   email: string;
   password: string;
   displayName: string;
-  avatar?: FileList;
+  avatar?: File | null;
 }
 
 export interface AuthResponse {

@@ -1,5 +1,4 @@
 import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
@@ -15,17 +14,15 @@ import {
   Typography,
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
-import { googleLogin, register as registerUser } from '@/features/users/usersThunks';
+import {
+  googleLogin,
+  register as registerUser,
+} from '@/features/users/usersThunks';
 import { selectRegisterLoading } from '@/features/users/usersSlice';
-
-const schema = z.object({
-  email: z.string().email('Введите корректный email'),
-  displayName: z.string().min(2, 'Минимум 2 символа'),
-  password: z.string().min(6, 'Минимум 6 символов'),
-  avatar: z.any().optional(),
-});
-
-type RegisterForm = z.infer<typeof schema>;
+import FileInput from '@/components/FileInput/FileInput';
+import { blue } from '@mui/material/colors';
+import type { ChangeEvent } from 'react';
+import { schemaRegister, type RegisterFormData } from './lib/validation';
 
 const RegisterPage = () => {
   const dispatch = useAppDispatch();
@@ -35,14 +32,23 @@ const RegisterPage = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
-  } = useForm<RegisterForm>({
-    resolver: zodResolver(schema),
+  } = useForm<RegisterFormData>({
+    resolver: zodResolver(schemaRegister),
   });
 
-  const onSubmit = async (data: RegisterForm) => {
+  const onSubmit = async (data: RegisterFormData) => {
     await dispatch(registerUser(data)).unwrap();
     navigate('/');
+  };
+
+  const onChangeFileHandler = (event: ChangeEvent<HTMLInputElement>) => {
+    const { name, files } = event.target;
+
+    if (files && files[0] && name === 'avatar') {
+      setValue(name, files[0]);
+    }
   };
 
   return (
@@ -57,15 +63,38 @@ const RegisterPage = () => {
       >
         <Paper elevation={3} sx={{ width: '100%', p: 4, borderRadius: 4 }}>
           <Stack spacing={1} sx={{ mb: 3 }}>
-            <Typography variant="h5" fontWeight={700}>
-              Register
-            </Typography>
-            <Typography color="text.secondary">
-              Create your account
-            </Typography>
+            <Typography variant="h5">Register</Typography>
+            <Typography color="text.secondary">Create your account</Typography>
           </Stack>
 
           <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'column',
+                gap: 3,
+              }}
+            >
+              <Box
+                sx={{
+                  width: '150px',
+                  height: '150px',
+                  borderRadius: '100%',
+                  overflow: 'hidden',
+                  border: 4,
+                  mb: 3,
+                  borderColor: blue[500],
+                }}
+              >
+                <FileInput
+                  label="Artist Photo"
+                  {...register('avatar')}
+                  onChange={onChangeFileHandler}
+                />
+              </Box>
+            </Box>
             <TextField
               fullWidth
               label="Email"
@@ -93,17 +122,7 @@ const RegisterPage = () => {
               helperText={errors.password?.message}
               {...register('password')}
             />
-
-            <Button
-              fullWidth
-              component="label"
-              variant="outlined"
-              sx={{ mb: 2, borderRadius: 2, textTransform: 'none' }}
-            >
-              Upload avatar
-              <input hidden type="file" {...register('avatar')} />
-            </Button>
-
+            
             <Button
               fullWidth
               type="submit"
@@ -127,7 +146,9 @@ const RegisterPage = () => {
               onSuccess={async (credentialResponse) => {
                 if (!credentialResponse.credential) return;
 
-                await dispatch(googleLogin(credentialResponse.credential)).unwrap();
+                await dispatch(
+                  googleLogin(credentialResponse.credential),
+                ).unwrap();
                 navigate('/');
               }}
               onError={() => {
@@ -138,7 +159,7 @@ const RegisterPage = () => {
 
           <Typography sx={{ mt: 3, textAlign: 'center' }}>
             Already have an account?{' '}
-            <Link component={RouterLink} to="/login" fontWeight={600}>
+            <Link component={RouterLink} to="/login">
               Login
             </Link>
           </Typography>
