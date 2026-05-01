@@ -7,15 +7,22 @@ import { cocktailUpload } from '../../middlewares/multer.ts';
 import deleteImage from '../../utils/deleteImage.ts';
 import permit from '../../middlewares/permit.ts';
 import togglePublishedHelper from '../../helpers/togglePublishedHelper.ts';
+import optionalAuth, {
+  type RequestOptionalUser,
+} from '../../middlewares/optionalAuth.ts';
 
 const cocktailsRouter = Router();
 
-cocktailsRouter.get('/', async (_req, res, next) => {
+cocktailsRouter.get('/', optionalAuth, async (req, res, next) => {
   try {
-    const cocktails = await Cocktail.find({ isPublished: true }).populate(
-      'user',
-      'displayName',
-    );
+    const reqUser = req as RequestOptionalUser;
+
+    const role = reqUser.user?.role || 'guest';
+
+    const cocktails = await Cocktail.find(
+      role === 'admin' ? {} : { isPublished: true },
+    ).populate('user', 'displayName');
+
     res.json(cocktails);
   } catch (error) {
     next(error);
