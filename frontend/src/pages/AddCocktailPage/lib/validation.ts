@@ -16,7 +16,11 @@ export const schemaCreateCocktail = z.object({
     .array(
       z.object({
         name: z.string().min(1, 'Name must be at least 1 characters long!'),
-        amount: z.string().min(1, 'Amount must be at least 1 characters long!'),
+
+        amount: z
+          .string()
+          .min(1, 'Amount must be at least 1 characters long!')
+          .regex(/^\d+$/, 'Only numbers are allowed'),
       }),
     )
     .min(1, 'min 1 ingredient'),

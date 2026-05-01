@@ -173,22 +173,20 @@ const AddCocktailPage = () => {
                         width: '40%',
                       }}
                       error={!!errors.ingredients?.[index]?.name}
-                      helperText={!!errors.ingredients?.[index]?.name?.message}
+                      helperText={errors.ingredients?.[index]?.name?.message}
                     />
                     <TextField
                       id="outlined-basic"
                       label="amount"
                       variant="outlined"
-                      type="text"
+                      type="number"
                       multiline
                       {...register(`ingredients.${index}.amount`)}
                       sx={{
                         width: '40%',
                       }}
                       error={!!errors.ingredients?.[index]?.amount}
-                      helperText={
-                        !!errors.ingredients?.[index]?.amount?.message
-                      }
+                      helperText={errors.ingredients?.[index]?.amount?.message}
                     />
                     {index !== 0 && (
                       <>
