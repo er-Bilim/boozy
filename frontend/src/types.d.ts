@@ -65,3 +65,8 @@ export interface IValidationError {
   name: string;
   _message: string;
 }
+
+export interface ICocktailDetails extends ICocktail {
+  averageRating: number;
+  ratingsCount: number;
+}

@@ -1,4 +1,9 @@
-import type { ICocktail, ICocktailMutation, IValidationError } from '@/types';
+import type {
+  ICocktail,
+  ICocktailDetails,
+  ICocktailMutation,
+  IValidationError,
+} from '@/types';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from '@/app/store.ts';
 import { isAxiosError } from 'axios';
@@ -110,6 +115,39 @@ export const deleteCocktail = createAsyncThunk<
       if (error.response) {
         rejectWithValue(error.response.data);
       }
+    }
+
+    throw error;
+  }
+});
+
+export const fetchCocktailById = createAsyncThunk<
+    ICocktailDetails,
+    string,
+    { rejectValue: string }
+>('cocktail/fetchById', async (id, { rejectWithValue }) => {
+  try {
+    const response = await axiosApi.get<ICocktailDetails>(`/cocktails/${id}`);
+    return response.data;
+  } catch (error) {
+    if (isAxiosError(error) && error.response) {
+      return rejectWithValue(error.response.data.error);
+    }
+
+    throw error;
+  }
+});
+
+export const rateCocktail = createAsyncThunk<
+    void,
+    { id: string; score: number },
+    { rejectValue: string }
+>('cocktail/rate', async ({ id, score }, { rejectWithValue }) => {
+  try {
+    await axiosApi.patch(`/cocktails/${id}/rate`, { score });
+  } catch (error) {
+    if (isAxiosError(error) && error.response) {
+      return rejectWithValue(error.response.data.error);
     }
 
     throw error;

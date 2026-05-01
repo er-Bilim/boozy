@@ -18,6 +18,7 @@ import {
 } from '@/features/cocktail/cocktailThunks';
 import { toast } from 'react-toastify';
 import ConfirmDialog from '@/components/ConfirmDialog/ConfirmDialog.tsx';
+import { Link } from 'react-router-dom';
 
 interface Props {
   id: string;
@@ -101,36 +102,43 @@ const CocktailCard: React.FC<Props> = ({
           </Typography>
         </CardContent>
 
-        {(isAdmin || user?._id === userId) && (
-          <CardActions
+        <CardActions
             sx={{
               justifyContent: 'space-between',
               borderTop: '1px solid #eee',
               p: 1,
             }}
-          >
-            <Box>
-              {!isPublished && isAdmin && (
+        >
+          <Box>
+            {!isPublished && isAdmin && (
                 <Button
-                  variant="outlined"
-                  size="small"
-                  color="success"
-                  onClick={() => handlePublish()}
+                    variant="outlined"
+                    size="small"
+                    color="success"
+                    onClick={handlePublish}
                 >
                   Publish
                 </Button>
-              )}
-            </Box>
-            <Button
-              size="small"
-              variant="outlined"
-              color="error"
-              onClick={() => setConfirmOpen(true)}
-            >
-              Delete
+            )}
+          </Box>
+
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            {(isAdmin || user?._id === userId) && (
+                <Button
+                    size="small"
+                    variant="outlined"
+                    color="error"
+                    onClick={() => setConfirmOpen(true)}
+                >
+                  Delete
+                </Button>
+            )}
+
+            <Button component={Link} to={`/cocktails/${id}`} size="small">
+              Details
             </Button>
-          </CardActions>
-        )}
+          </Box>
+        </CardActions>
       </Card>
       <ConfirmDialog
         open={confirmOpen}
