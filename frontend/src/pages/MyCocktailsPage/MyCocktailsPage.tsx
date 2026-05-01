@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 import { fetchMyCocktails } from '@/features/cocktail/cocktailThunks.ts';
 import CocktailSkeleton from '@/components/CocktailSkeleton/CocktailSkeleton.tsx';
 import CocktailCard from '@/components/CocktailCard/CocktailCard.tsx';
+import { clearCocktails } from '@/features/cocktail/cocktailSlice.ts';
 
 const MyCocktailsPage = () => {
   const dispatch = useAppDispatch();
@@ -25,6 +26,9 @@ const MyCocktailsPage = () => {
 
   useEffect(() => {
     void fetchAllCocktails();
+    return () => {
+      dispatch(clearCocktails());
+    };
   }, []);
 
   return (
@@ -33,7 +37,15 @@ const MyCocktailsPage = () => {
         My Cocktails
       </Typography>
 
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 2,
+          opacity: loading ? 0.1 : 1,
+          transition: 'opacity 1s ease-in-out',
+        }}
+      >
         {loading ? (
           <CocktailSkeleton />
         ) : (
@@ -45,6 +57,7 @@ const MyCocktailsPage = () => {
               recipe={cocktail.recipe}
               image={cocktail.image}
               id={cocktail._id}
+              userId={cocktail.user as string}
             />
           ))
         )}

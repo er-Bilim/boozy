@@ -33,7 +33,11 @@ const initialState: CocktailState = {
 export const cocktailSlice = createSlice({
   name: 'cocktails',
   initialState,
-  reducers: {},
+  reducers: {
+    clearCocktails: (state) => {
+      state.cocktails = [];
+    },
+  },
   extraReducers(builder) {
     builder.addCase(createCocktail.pending, (state) => {
       state.loading.createLoading = true;
@@ -81,3 +85,4 @@ export const cocktailSlice = createSlice({
 });
 
 export const cocktailReducer = cocktailSlice.reducer;
+export const { clearCocktails } = cocktailSlice.actions;
