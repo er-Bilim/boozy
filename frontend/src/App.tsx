@@ -7,6 +7,7 @@ import CocktailsPage from '@/pages/CocktailsPage/CocktailsPage';
 import LoginPage from '@/pages/LoginPage/LoginPage';
 import MyCocktailsPage from '@/pages/MyCocktailsPage/MyCocktailsPage';
 import RegisterPage from '@/pages/RegisterPage/RegisterPage';
+import NotFound from './pages/NotFound/NotFound';
 
 const App = () => {
   return (
@@ -21,6 +22,7 @@ const App = () => {
           <Route path="cocktails/new" element={<AddCocktailPage />} />
           <Route path="cocktails/my" element={<MyCocktailsPage />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
   );
