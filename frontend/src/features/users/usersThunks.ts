@@ -27,3 +27,14 @@ export const register = createAsyncThunk<AuthResponse, RegisterMutation>(
     return response.data;
   },
 );
+
+export const googleLogin = createAsyncThunk<AuthResponse, string>(
+  'users/googleLogin',
+  async (credential) => {
+    const formData = new FormData();
+    formData.append('credential', credential);
+
+    const response = await axiosApi.post<AuthResponse>('/users/google', formData);
+    return response.data;
+  },
+);
