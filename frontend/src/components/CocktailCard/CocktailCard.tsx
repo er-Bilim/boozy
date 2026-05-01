@@ -25,6 +25,7 @@ interface Props {
   image: string | null;
   isPublished: boolean;
   recipe: string;
+  userId: string;
 }
 
 const CocktailCard: React.FC<Props> = ({
@@ -33,6 +34,7 @@ const CocktailCard: React.FC<Props> = ({
   image,
   recipe,
   isPublished,
+  userId,
 }) => {
   const user = useAppSelector(selectUser);
   const isAdmin = user?.role === 'admin';
@@ -65,10 +67,10 @@ const CocktailCard: React.FC<Props> = ({
           position: 'relative',
         }}
       >
-        {!isPublished && isAdmin && (
+        {!isPublished && (
           <Chip
             label="Unpublished"
-            color="warning"
+            color="primary"
             size="small"
             sx={{ position: 'absolute', top: 10, right: 10, zIndex: 1 }}
           />
@@ -99,7 +101,7 @@ const CocktailCard: React.FC<Props> = ({
           </Typography>
         </CardContent>
 
-        {isAdmin && (
+        {(isAdmin || user?._id === userId) && (
           <CardActions
             sx={{
               justifyContent: 'space-between',
@@ -108,8 +110,9 @@ const CocktailCard: React.FC<Props> = ({
             }}
           >
             <Box>
-              {!isPublished && (
+              {!isPublished && isAdmin && (
                 <Button
+                  variant="outlined"
                   size="small"
                   color="success"
                   onClick={() => handlePublish()}
@@ -120,6 +123,7 @@ const CocktailCard: React.FC<Props> = ({
             </Box>
             <Button
               size="small"
+              variant="outlined"
               color="error"
               onClick={() => setConfirmOpen(true)}
             >

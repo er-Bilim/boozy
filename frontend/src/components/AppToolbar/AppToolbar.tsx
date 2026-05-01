@@ -1,4 +1,4 @@
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Avatar,
@@ -13,12 +13,20 @@ import {
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { BASE_URL } from '@/constants';
 import { unsetUser } from '@/features/users/usersSlice';
+import { clearCocktails } from '@/features/cocktail/cocktailSlice';
 
 const AppToolbar = () => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.users.user);
 
   const avatarSrc = user?.avatar ? `${BASE_URL}/${user.avatar}` : undefined;
+
+  const handleLogout = async () => {
+    dispatch(unsetUser());
+    dispatch(clearCocktails());
+    navigate('/');
+  };
 
   return (
     <AppBar
@@ -82,7 +90,11 @@ const AppToolbar = () => {
                 <Button
                   component={RouterLink}
                   to="/cocktails/new"
-                  sx={{ borderRadius: 999, textTransform: 'none', fontWeight: 600 }}
+                  sx={{
+                    borderRadius: 999,
+                    textTransform: 'none',
+                    fontWeight: 600,
+                  }}
                 >
                   Add cocktail
                 </Button>
@@ -90,7 +102,11 @@ const AppToolbar = () => {
                 <Button
                   component={RouterLink}
                   to="/cocktails/my"
-                  sx={{ borderRadius: 999, textTransform: 'none', fontWeight: 600 }}
+                  sx={{
+                    borderRadius: 999,
+                    textTransform: 'none',
+                    fontWeight: 600,
+                  }}
                 >
                   My cocktails
                 </Button>
@@ -115,10 +131,7 @@ const AppToolbar = () => {
               </Avatar>
 
               <Box>
-                <Typography
-                  fontWeight={700}
-                  sx={{ lineHeight: 1.1 }}
-                >
+                <Typography fontWeight={700} sx={{ lineHeight: 1.1 }}>
                   {user.displayName}
                 </Typography>
 
@@ -131,8 +144,12 @@ const AppToolbar = () => {
 
               <Button
                 size="small"
-                onClick={() => dispatch(unsetUser())}
-                sx={{ borderRadius: 999, textTransform: 'none', fontWeight: 700 }}
+                onClick={() => handleLogout()}
+                sx={{
+                  borderRadius: 999,
+                  textTransform: 'none',
+                  fontWeight: 700,
+                }}
               >
                 Logout
               </Button>
@@ -142,7 +159,11 @@ const AppToolbar = () => {
               <Button
                 component={RouterLink}
                 to="/login"
-                sx={{ borderRadius: 999, textTransform: 'none', fontWeight: 700 }}
+                sx={{
+                  borderRadius: 999,
+                  textTransform: 'none',
+                  fontWeight: 700,
+                }}
               >
                 Login
               </Button>
@@ -151,7 +172,11 @@ const AppToolbar = () => {
                 component={RouterLink}
                 to="/register"
                 variant="contained"
-                sx={{ borderRadius: 999, textTransform: 'none', fontWeight: 700 }}
+                sx={{
+                  borderRadius: 999,
+                  textTransform: 'none',
+                  fontWeight: 700,
+                }}
               >
                 Register
               </Button>

@@ -65,7 +65,8 @@ export const fetchMyCocktails = createAsyncThunk<
 >('cocktail/fetchMy', async (_, { rejectWithValue }) => {
   try {
     const response = await axiosApi.get('/cocktails/my');
-    return response.data || [];
+    if (response.data !== null) return response.data;
+    return [];
   } catch (error) {
     if (isAxiosError(error)) {
       if (error.response) {

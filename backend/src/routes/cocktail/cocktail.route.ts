@@ -34,11 +34,6 @@ cocktailsRouter.get('/my', auth, async (req, res, next) => {
     const { user } = req as RequestWithUser;
 
     const userCocktails = await Cocktail.find({ user: user._id });
-
-    if (userCocktails.length === 0) {
-      return null;
-    }
-
     return res.json(userCocktails);
   } catch (error) {
     next(error);
