@@ -14,7 +14,7 @@ import type { ICocktailMutation } from '@/types';
 import { useAppDispatch, useAppSelector } from '@/app/hooks';
 import { selectLoading } from '@/features/cocktail/cocktailSelectors';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import { createCocktail } from '@/features/cocktail/cocktailThunk';
+import { createCocktail } from '@/features/cocktail/cocktailThunks.ts';
 import { toast } from 'react-toastify';
 
 const AddCocktailPage = () => {
@@ -52,7 +52,7 @@ const AddCocktailPage = () => {
     try {
       await dispatch(createCocktail(data)).unwrap();
       navigate('/');
-      toast.success('Your cocktail is under review')
+      toast.success('Your cocktail is under review');
     } catch (error) {
       console.error(error);
     }
