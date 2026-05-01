@@ -23,7 +23,7 @@ export interface Rating {
   score: number;
 }
 
-export interface Cocktail {
+export interface ICocktail {
   _id: string;
   user: string | User;
   title: string;
