@@ -10,6 +10,7 @@ import {
   REHYDRATE,
 } from 'redux-persist';
 import usersReducer from '@/features/users/usersSlice';
+import { cocktailReducer } from '@/features/cocktail/cocktailSlice';
 
 const storage = {
   getItem: (key: string) => {
@@ -27,6 +28,7 @@ const storage = {
 
 const rootReducer = combineReducers({
   users: usersReducer,
+  cocktail: cocktailReducer,
 });
 
 const persistConfig = {
