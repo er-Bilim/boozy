@@ -48,6 +48,9 @@ const MyCocktailsPage = () => {
             />
           ))
         )}
+        {!loading &&
+          cocktails.length === 0 &&
+          'There are no cocktails yet. Be the first to add a recipe!'}
       </Box>
     </Box>
   );

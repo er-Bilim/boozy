@@ -42,11 +42,11 @@ export const createCocktail = createAsyncThunk<
 export const fetchCocktails = createAsyncThunk<
   ICocktail[],
   void,
-  { rejectValue: IValidationError }
+  { rejectValue: string }
 >('cocktail/fetchAll', async (_, { rejectWithValue }) => {
   try {
     const response = await axiosApi.get('/cocktails');
-    return response.data;
+    return response.data || [];
   } catch (error) {
     if (isAxiosError(error)) {
       if (error.response) {
@@ -61,11 +61,49 @@ export const fetchCocktails = createAsyncThunk<
 export const fetchMyCocktails = createAsyncThunk<
   ICocktail[],
   void,
-  { rejectValue: IValidationError }
+  { rejectValue: string }
 >('cocktail/fetchMy', async (_, { rejectWithValue }) => {
   try {
     const response = await axiosApi.get('/cocktails/my');
-    return response.data;
+    return response.data || [];
+  } catch (error) {
+    if (isAxiosError(error)) {
+      if (error.response) {
+        rejectWithValue(error.response.data);
+      }
+    }
+
+    throw error;
+  }
+});
+
+export const publishCocktail = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>('cocktail/publish', async (id, { rejectWithValue }) => {
+  try {
+    await axiosApi.patch(`/cocktails/${id}/publish`);
+    return id;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      if (error.response) {
+        rejectWithValue(error.response.data);
+      }
+    }
+
+    throw error;
+  }
+});
+
+export const deleteCocktail = createAsyncThunk<
+  string,
+  string,
+  { rejectValue: string }
+>('cocktail/delete', async (id, { rejectWithValue }) => {
+  try {
+    await axiosApi.delete(`/cocktails/${id}/delete`);
+    return id;
   } catch (error) {
     if (isAxiosError(error)) {
       if (error.response) {

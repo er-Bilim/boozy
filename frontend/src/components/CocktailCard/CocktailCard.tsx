@@ -8,10 +8,16 @@ import {
   Box,
   Chip,
 } from '@mui/material';
-import { useAppSelector } from '@/app/hooks.ts';
+import { useAppDispatch, useAppSelector } from '@/app/hooks.ts';
 import { selectUser } from '@/features/users/usersSlice.ts';
 import { getImage } from '@/utils/getImage.ts';
-import React from 'react';
+import React, { useState } from 'react';
+import {
+  deleteCocktail,
+  publishCocktail,
+} from '@/features/cocktail/cocktailThunks';
+import { toast } from 'react-toastify';
+import ConfirmDialog from '@/components/ConfirmDialog/ConfirmDialog.tsx';
 
 interface Props {
   id: string;
@@ -30,79 +36,106 @@ const CocktailCard: React.FC<Props> = ({
 }) => {
   const user = useAppSelector(selectUser);
   const isAdmin = user?.role === 'admin';
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const dispatch = useAppDispatch();
+
+  const handleDelete = async () => {
+    try {
+      await dispatch(deleteCocktail(id)).unwrap();
+    } catch (e) {
+      toast.error('Failed to delete cocktail');
+    }
+  };
+
+  const handlePublish = async () => {
+    try {
+      await dispatch(publishCocktail(id)).unwrap();
+    } catch (e) {
+      toast.error('Failed to publish cocktail');
+    }
+  };
 
   return (
-    <Card
-      sx={{
-        width: 300,
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-      }}
-    >
-      {!isPublished && isAdmin && (
-        <Chip
-          label="Unpublished"
-          color="warning"
-          size="small"
-          sx={{ position: 'absolute', top: 10, right: 10, zIndex: 1 }}
-        />
-      )}
-
-      <CardMedia
-        component="img"
-        height="200"
-        image={getImage(image)}
-        alt={title}
-      />
-
-      <CardContent sx={{ flexGrow: 1 }}>
-        <Typography variant="h6" gutterBottom>
-          {title}
-        </Typography>
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{
-            display: '-webkit-box',
-            WebkitLineClamp: 3,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          }}
-        >
-          {recipe}
-        </Typography>
-      </CardContent>
-
-      {isAdmin && (
-        <CardActions
-          sx={{
-            justifyContent: 'space-between',
-            borderTop: '1px solid #eee',
-            p: 1,
-          }}
-        >
-          <Box>
-            {!isPublished && (
-              <Button
-                size="small"
-                color="success"
-                onClick={() => console.log('Publish', id)}
-              >
-                Publish
-              </Button>
-            )}
-          </Box>
-          <Button
+    <>
+      <Card
+        sx={{
+          width: 300,
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative',
+        }}
+      >
+        {!isPublished && isAdmin && (
+          <Chip
+            label="Unpublished"
+            color="warning"
             size="small"
-            color="error"
-            onClick={() => console.log('Delete', id)}
+            sx={{ position: 'absolute', top: 10, right: 10, zIndex: 1 }}
+          />
+        )}
+
+        <CardMedia
+          component="img"
+          height="200"
+          image={getImage(image)}
+          alt={title}
+        />
+
+        <CardContent sx={{ flexGrow: 1 }}>
+          <Typography variant="h6" gutterBottom>
+            {title}
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{
+              display: '-webkit-box',
+              WebkitLineClamp: 3,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+            }}
           >
-            Delete
-          </Button>
-        </CardActions>
-      )}
-    </Card>
+            {recipe}
+          </Typography>
+        </CardContent>
+
+        {isAdmin && (
+          <CardActions
+            sx={{
+              justifyContent: 'space-between',
+              borderTop: '1px solid #eee',
+              p: 1,
+            }}
+          >
+            <Box>
+              {!isPublished && (
+                <Button
+                  size="small"
+                  color="success"
+                  onClick={() => handlePublish()}
+                >
+                  Publish
+                </Button>
+              )}
+            </Box>
+            <Button
+              size="small"
+              color="error"
+              onClick={() => setConfirmOpen(true)}
+            >
+              Delete
+            </Button>
+          </CardActions>
+        )}
+      </Card>
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={handleDelete}
+        title="Delete cocktail?"
+        message={`Are you sure you want to delete the ${title}?`}
+      />
+    </>
   );
 };
 

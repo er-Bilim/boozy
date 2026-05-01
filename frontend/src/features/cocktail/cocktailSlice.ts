@@ -1,10 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
   createCocktail,
+  deleteCocktail,
   fetchCocktails,
   fetchMyCocktails,
+  publishCocktail,
 } from './cocktailThunks.ts';
-import type { ICocktail, IValidationError } from '../../types';
+import type { ICocktail, IValidationError } from '@/types';
 
 interface CocktailState {
   cocktails: ICocktail[];
@@ -63,6 +65,17 @@ export const cocktailSlice = createSlice({
     });
     builder.addCase(fetchMyCocktails.rejected, (state) => {
       state.loading.fetchLoading = false;
+    });
+    builder.addCase(deleteCocktail.fulfilled, (state, { meta }) => {
+      state.cocktails = state.cocktails.filter(
+        (cocktail) => cocktail._id !== meta.arg,
+      );
+    });
+    builder.addCase(publishCocktail.fulfilled, (state, { meta }) => {
+      const index = state.cocktails.findIndex((c) => c._id === meta.arg);
+      if (index !== -1) {
+        state.cocktails[index].isPublished = true;
+      }
     });
   },
 });
