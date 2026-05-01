@@ -2,17 +2,21 @@ import { createSlice } from '@reduxjs/toolkit';
 import {
   createCocktail,
   deleteCocktail,
+  fetchCocktailById,
   fetchCocktails,
   fetchMyCocktails,
   publishCocktail,
+  rateCocktail,
 } from './cocktailThunks.ts';
-import type { ICocktail, IValidationError } from '@/types';
+import type { ICocktail, ICocktailDetails, IValidationError } from '@/types';
 
 interface CocktailState {
   cocktails: ICocktail[];
+  selectedCocktail: ICocktailDetails | null;
   loading: {
     createLoading: boolean;
     fetchLoading: boolean;
+    rateLoading: boolean;
   };
   errors: {
     createError: IValidationError | null;
@@ -21,9 +25,11 @@ interface CocktailState {
 
 const initialState: CocktailState = {
   cocktails: [],
+  selectedCocktail: null,
   loading: {
     createLoading: false,
     fetchLoading: false,
+    rateLoading: false,
   },
   errors: {
     createError: null,
@@ -50,6 +56,7 @@ export const cocktailSlice = createSlice({
       state.loading.createLoading = false;
       state.errors.createError = error || null;
     });
+
     builder.addCase(fetchCocktails.pending, (state) => {
       state.loading.fetchLoading = true;
     });
@@ -60,6 +67,7 @@ export const cocktailSlice = createSlice({
     builder.addCase(fetchCocktails.rejected, (state) => {
       state.loading.fetchLoading = false;
     });
+
     builder.addCase(fetchMyCocktails.pending, (state) => {
       state.loading.fetchLoading = true;
     });
@@ -70,13 +78,38 @@ export const cocktailSlice = createSlice({
     builder.addCase(fetchMyCocktails.rejected, (state) => {
       state.loading.fetchLoading = false;
     });
+
+    builder.addCase(fetchCocktailById.pending, (state) => {
+      state.loading.fetchLoading = true;
+      state.selectedCocktail = null;
+    });
+    builder.addCase(fetchCocktailById.fulfilled, (state, { payload }) => {
+      state.loading.fetchLoading = false;
+      state.selectedCocktail = payload;
+    });
+    builder.addCase(fetchCocktailById.rejected, (state) => {
+      state.loading.fetchLoading = false;
+    });
+
+    builder.addCase(rateCocktail.pending, (state) => {
+      state.loading.rateLoading = true;
+    });
+    builder.addCase(rateCocktail.fulfilled, (state) => {
+      state.loading.rateLoading = false;
+    });
+    builder.addCase(rateCocktail.rejected, (state) => {
+      state.loading.rateLoading = false;
+    });
+
     builder.addCase(deleteCocktail.fulfilled, (state, { meta }) => {
       state.cocktails = state.cocktails.filter(
-        (cocktail) => cocktail._id !== meta.arg,
+          (cocktail) => cocktail._id !== meta.arg,
       );
     });
+
     builder.addCase(publishCocktail.fulfilled, (state, { meta }) => {
       const index = state.cocktails.findIndex((c) => c._id === meta.arg);
+
       if (index !== -1) {
         state.cocktails[index].isPublished = true;
       }
